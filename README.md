@@ -1,0 +1,1 @@
+This is a collection of small projects to derust my rust skills
