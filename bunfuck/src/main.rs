@@ -2,8 +2,7 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 
-const MAX_MEMORY: usize = 640 * 1024;
-const MAX_STACK: usize = 1024;
+const MAX_MEMORY: usize = u8::MAX as usize + 1;
 
 #[derive(Debug, Eq, PartialEq)]
 enum Op {
@@ -13,6 +12,8 @@ enum Op {
     DecVal,
     Output,
     Input,
+    
+    // TODO: replace with Loop<Vec<Op>>
     OpenBracketUnlinked,
     CloseBracketUnlinked,
     OpenBracket(usize),
@@ -55,18 +56,19 @@ fn main() {
     let mut debug_column = 0;
     let mut ops = Vec::<Op>::with_capacity(code.len()); // should be about what we need
     for c in code.chars() {
+        if c == '\n' {
+            debug_line += 1;
+            debug_column = 0;
+        } else {
+            debug_column += 1;
+        }
+        
         if c.is_whitespace() {
-            if c == '\n' {
-                debug_line += 1;
-                debug_column = 0;
-            } else {
-                debug_column += 1;
-            }
             continue;
         }
         
         let op = if debug {
-            Op::get(c).expect(&format!("Unknown char '{}' at {}:{}:{}", c, &path, debug_line + 1, debug_column + 1))
+            Op::get(c).unwrap_or_else(|| panic!("Unknown char '{}' at {}:{}:{}", c, path, debug_line + 1, debug_column + 1))
         } else {
             let Some(op) = Op::get(c) else {
                 continue;
@@ -77,7 +79,7 @@ fn main() {
         ops.push(op);
     }
     
-    let mut paren_stack = vec!();
+    let mut paren_stack = vec![];
     for i in 0..ops.len() {
         let Some(op) = ops.get(i) else {
             panic!("Could not find op");
@@ -104,7 +106,7 @@ fn main() {
 
 fn run(ops: Vec<Op>) {
     let mut tape: [u8; MAX_MEMORY] = [0; MAX_MEMORY]; // 640KB should be enough for anybody
-    let mut dp: usize = 0;
+    let mut dp: u8 = 0;
     let mut ip: usize = 0;
     
     while ip < ops.len() {
@@ -115,10 +117,10 @@ fn run(ops: Vec<Op>) {
         match op {
             Op::IncDp => dp = dp.wrapping_add(1),
             Op::DecDp => dp = dp.wrapping_sub(1),
-            Op::IncVal => tape[dp] = tape[dp].wrapping_add(1),
-            Op::DecVal => tape[dp] = tape[dp].wrapping_sub(1),
+            Op::IncVal => tape[dp as usize] = tape[dp as usize].wrapping_add(1),
+            Op::DecVal => tape[dp as usize] = tape[dp as usize].wrapping_sub(1),
             Op::Output => {
-                let Some(char) = char::from_u32(tape[dp] as u32) else {
+                let Some(char) = char::from_u32(tape[dp as usize] as u32) else {
                     continue;
                 };
                 print!("{}", char);
@@ -126,16 +128,16 @@ fn run(ops: Vec<Op>) {
             Op::Input => {
                 let mut input = String::new();
                 std::io::stdin().read_line(&mut input).expect("Except stdin to work lol");
-                let char = input.chars().nth(0).unwrap_or_default();
-                tape[dp] = char as u8;
+                let char = input.chars().next().unwrap_or_default();
+                tape[dp as usize] = char as u8;
             }
             Op::OpenBracket(jump) => {
-                if tape[dp] == 0 {
+                if tape[dp as usize] == 0 {
                     ip = *jump;
                 }
             }
             Op::CloseBracket(jump) => {
-                if tape[dp] != 0 {
+                if tape[dp as usize] != 0 {
                     ip = *jump;
                 }
             }
