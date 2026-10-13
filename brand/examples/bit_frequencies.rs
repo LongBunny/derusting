@@ -1,9 +1,13 @@
 use std::any::type_name;
 
-use brand::{Rng, Lcg};
+use brand::lcg::{Lcg, TinyLcg};
+use brand::Rng;
 
 fn main() {
     let mut rng = Lcg::new(16231235);
+    frequencies(&mut rng, 1_000_000);
+    
+    let mut rng = TinyLcg::new(16231235);
     frequencies(&mut rng, 1_000_000);
 }
 

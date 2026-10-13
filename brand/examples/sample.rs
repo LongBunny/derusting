@@ -1,8 +1,12 @@
 ﻿use std::any::type_name;
-use brand::{Rng, Lcg};
+use brand::{Rng};
+use brand::lcg::{Lcg, TinyLcg};
 
 fn main() {
     let mut rng = Lcg::new(16231235);
+    sample(&mut rng, 10);
+    
+    let mut rng = TinyLcg::new(16231235);
     sample(&mut rng, 10);
 }
 

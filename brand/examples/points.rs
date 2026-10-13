@@ -1,14 +1,18 @@
 mod common;
 
 use crate::common::write_p6;
-use brand::{Lcg, Rng};
 use std::any::type_name;
+use brand::lcg::{Lcg, TinyLcg};
+use brand::Rng;
 
 fn main() -> std::io::Result<()> {
     let width = 1024;
     let height = 1024;
 
     let mut rng = Lcg::new(16231235);
+    points(&mut rng, width, height)?;
+    
+    let mut rng = TinyLcg::new(16231235);
     points(&mut rng, width, height)?;
 
     Ok(())
