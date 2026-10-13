@@ -1,9 +1,9 @@
-use std::any::type_name;
-use std::fs;
-use std::fs::{OpenOptions};
-use std::io::{BufWriter, Write};
-use std::path::Path;
+mod common;
+
+use crate::common::open_file;
 use brand::{Lcg, Rng};
+use std::any::type_name;
+use std::io::{BufWriter, Write};
 
 fn main() -> std::io::Result<()> {
     let width = 512;
@@ -20,16 +20,7 @@ fn noise<R: Rng>(rng: &mut R, width: u32, height: u32) -> std::io::Result<()> {
     println!("=========== {} ===========", name);
 
     let filename = String::from(format!("out/{name}/noise_lo.ppm"));
-    let path = Path::new(&filename);
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)?;
-    }
-    let file = OpenOptions::new()
-        .create(true)
-        .truncate(true)
-        .write(true)
-        .open(path)?;
-    let mut writer = BufWriter::new(file);
+    let mut writer = BufWriter::new(open_file(&filename)?);
 
     write!(writer, "P6\n{width} {height}\n255\n")?;
     for _ in 0..width * height {
@@ -40,16 +31,7 @@ fn noise<R: Rng>(rng: &mut R, width: u32, height: u32) -> std::io::Result<()> {
     println!("Created {}", &filename);
 
     let filename = String::from(format!("out/{name}/noise_hi.ppm"));
-    let path = Path::new(&filename);
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)?;
-    }
-    let file = OpenOptions::new()
-        .create(true)
-        .truncate(true)
-        .write(true)
-        .open(path)?;
-    let mut writer = BufWriter::new(file);
+    let mut writer = BufWriter::new(open_file(&filename)?);
 
     write!(writer, "P6\n{width} {height}\n255\n")?;
     for _ in 0..width * height {

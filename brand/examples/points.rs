@@ -1,7 +1,9 @@
-use std::any::type_name;
-use std::fs::File;
-use std::io::{BufWriter, Write};
+mod common;
+
 use brand::{Lcg, Rng};
+use std::any::type_name;
+use std::io::{BufWriter, Write};
+use crate::common::open_file;
 
 fn main() -> std::io::Result<()> {
     let width = 512;
@@ -17,25 +19,12 @@ fn points<R: Rng>(rng: &mut R, width: u32, height: u32) -> std::io::Result<()> {
     let name = type_name::<R>().rsplit("::").next().unwrap().to_uppercase();
     println!("=========== {} ===========", name);
 
-    let filename = String::from(format!("{name}_lo.ppm"));
-    let file = File::create(&filename)?;
-    let mut writer = BufWriter::new(file);
+    let filename = String::from(format!("out/{name}/points.ppm"));
+    let mut writer = BufWriter::new(open_file(&filename)?);
 
     write!(writer, "P6\n{width} {height}\n255\n")?;
     for _ in 0..width * height {
         let value = rng.next_u64() as u8;
-        writer.write_all(&[value, value, value])?;
-    }
-    writer.flush()?;
-    println!("Created {}", &filename);
-
-    let filename = String::from(format!("{name}_hi.ppm"));
-    let file = File::create(&filename)?;
-    let mut writer = BufWriter::new(file);
-
-    write!(writer, "P6\n{width} {height}\n255\n")?;
-    for _ in 0..width * height {
-        let value = (rng.next_u64() >> 56) as u8;
         writer.write_all(&[value, value, value])?;
     }
     writer.flush()?;
