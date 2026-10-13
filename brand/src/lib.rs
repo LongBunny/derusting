@@ -9,9 +9,9 @@ pub struct Lcg {
 }
 
 impl Lcg {
-    const A: u64 = 48271;
-    const C: u64 = 0;
-    const M: u64 = 2u64.pow(31) - 1;
+    const A: u64 = 6364136223846793005;
+    const C: u64 = 9754186451795953191;
+    const M: u64 = u64::MAX;
     pub const MAX: u64 = Self::M;
 }
 
