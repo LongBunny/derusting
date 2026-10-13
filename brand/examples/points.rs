@@ -1,13 +1,12 @@
 mod common;
 
+use crate::common::write_p6;
 use brand::{Lcg, Rng};
 use std::any::type_name;
-use std::io::{BufWriter, Write};
-use crate::common::open_file;
 
 fn main() -> std::io::Result<()> {
-    let width = 512;
-    let height = 512;
+    let width = 1024;
+    let height = 1024;
 
     let mut rng = Lcg::new(16231235);
     points(&mut rng, width, height)?;
@@ -15,20 +14,24 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn points<R: Rng>(rng: &mut R, width: u32, height: u32) -> std::io::Result<()> {
+fn points<R: Rng>(rng: &mut R, width: usize, height: usize) -> std::io::Result<()> {
     let name = type_name::<R>().rsplit("::").next().unwrap().to_uppercase();
     println!("=========== {} ===========", name);
 
-    let filename = String::from(format!("out/{name}/points.ppm"));
-    let mut writer = BufWriter::new(open_file(&filename)?);
-
-    write!(writer, "P6\n{width} {height}\n255\n")?;
-    for _ in 0..width * height {
-        let value = rng.next_u64() as u8;
-        writer.write_all(&[value, value, value])?;
+    let mut data = vec![0u8; width * height];
+    
+    for _ in 0..100_000 {
+        let x = rng.next_f64();
+        let y = rng.next_f64();
+        
+        let px = (x * width as f64) as usize;
+        let py = (y * height as f64) as usize;
+        
+        let idx = py * width + px;
+        data[idx] = 255;
     }
-    writer.flush()?;
-    println!("Created {}", &filename);
+    
+    write_p6(&format!("out/{name}/points_u8.ppm"), &data, width, height)?;
 
     Ok(())
 }

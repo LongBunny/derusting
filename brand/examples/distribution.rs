@@ -14,8 +14,8 @@ fn distribution<R: Rng>(rng: &mut R, samples: usize) {
     let mut average = 0f64;
     let mut histogram = [0u64; 10];
     for i in 0..samples {
-        let value = rng.next_u64();
-        let value: f64 = value as f64 / Lcg::MAX as f64;
+        let value = rng.next_u64() >> 11;
+        let value = value as f64 / (1u64 << 53) as f64;
         if value < min {min = value}
         if value > max {max = value}
         average += (value - average) / (i + 1) as f64;

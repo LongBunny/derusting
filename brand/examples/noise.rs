@@ -1,9 +1,8 @@
 mod common;
 
-use crate::common::open_file;
+use crate::common::write_p6;
 use brand::{Lcg, Rng};
 use std::any::type_name;
-use std::io::{BufWriter, Write};
 
 fn main() -> std::io::Result<()> {
     let width = 512;
@@ -15,31 +14,20 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn noise<R: Rng>(rng: &mut R, width: u32, height: u32) -> std::io::Result<()> {
+fn noise<R: Rng>(rng: &mut R, width: usize, height: usize) -> std::io::Result<()> {
     let name = type_name::<R>().rsplit("::").next().unwrap().to_uppercase();
     println!("=========== {} ===========", name);
 
-    let filename = String::from(format!("out/{name}/noise_lo.ppm"));
-    let mut writer = BufWriter::new(open_file(&filename)?);
-
-    write!(writer, "P6\n{width} {height}\n255\n")?;
+    let mut low = Vec::with_capacity(width * height);
+    let mut high = Vec::with_capacity(width * height);
     for _ in 0..width * height {
-        let value = rng.next_u64() as u8;
-        writer.write_all(&[value, value, value])?;
+        let value = rng.next_u64();
+        low.push(value as u8);
+        high.push((value >> 56) as u8);
     }
-    writer.flush()?;
-    println!("Created {}", &filename);
-
-    let filename = String::from(format!("out/{name}/noise_hi.ppm"));
-    let mut writer = BufWriter::new(open_file(&filename)?);
-
-    write!(writer, "P6\n{width} {height}\n255\n")?;
-    for _ in 0..width * height {
-        let value = (rng.next_u64() >> 56) as u8;
-        writer.write_all(&[value, value, value])?;
-    }
-    writer.flush()?;
-    println!("Created {}", &filename);
+    
+    write_p6(&format!("out/{name}/noise_lo.ppm"), &low, width, height)?;
+    write_p6(&format!("out/{name}/noise_hi.ppm"), &high, width, height)?;
 
     Ok(())
 }
