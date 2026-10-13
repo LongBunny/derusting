@@ -12,13 +12,11 @@ impl Lcg {
     const A: u64 = 48271;
     const C: u64 = 0;
     const M: u64 = 2u64.pow(31) - 1;
-    pub const MAX: u64 = Self::M;    
+    pub const MAX: u64 = Self::M;
 }
 
 impl Rng for Lcg {
-    fn new(seed: u64) -> Self {
-        Self { state: seed }
-    }
+    fn new(seed: u64) -> Self { Self { state: seed } }
 
     fn next_u64(&mut self) -> u64 {
         self.state = self.state
