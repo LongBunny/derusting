@@ -1,3 +1,6 @@
+use std::num::NonZeroU64;
+use crate::splitmix::Splitmix64;
+
 pub mod lcg;
 pub mod xor;
 pub mod splitmix;
@@ -24,6 +27,16 @@ pub trait Rng {
     
     fn next_f32(&mut self) -> f32 {
         self.next_f64() as f32
+    }
+}
+
+fn nonzero_seed(seed: u64) -> NonZeroU64 {
+    let mut seed_rng = Splitmix64::new(seed);
+
+    loop {
+        if let Some(state) = NonZeroU64::new(seed_rng.next_u64()) {
+            break state;
+        }
     }
 }
 

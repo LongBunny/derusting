@@ -7,7 +7,6 @@ pub struct Lcg {
 impl Lcg {
     const A: u64 = 6364136223846793005;
     const C: u64 = 9754186451795953191;
-    const M: u64 = u64::MAX;
 }
 
 impl Rng for Lcg {
@@ -16,8 +15,7 @@ impl Rng for Lcg {
     fn next_u64(&mut self) -> u64 {
         self.state = self.state
             .wrapping_mul(Self::A)
-            .wrapping_add(Self::C)
-            % Self::M; // not necessary as M is u64::MAX
+            .wrapping_add(Self::C);
         self.state
     }
 }
