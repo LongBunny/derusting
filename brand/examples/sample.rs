@@ -17,5 +17,7 @@ fn sample<R: Rng>(rng: &mut R, count: usize) -> std::io::Result<()> {
         println!("{value:20}  {value:016X}");
     }
 
+    println!("\n");
+
     Ok(())
 }

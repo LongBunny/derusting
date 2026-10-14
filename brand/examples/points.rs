@@ -32,5 +32,7 @@ fn points<R: Rng>(rng: &mut R, _unused: usize) -> std::io::Result<()> {
     
     write_p6(&format!("out/{name}/points_u8.ppm"), &data, WIDTH, HEIGHT)?;
 
+    println!("\n");
+
     Ok(())
 }

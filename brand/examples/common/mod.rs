@@ -6,16 +6,21 @@ use std::{fs, io};
 macro_rules! run_all_rngs {
     ($test:ident, $count:expr) => {{
         use brand::lcg::{Lcg, TinyLcg};
+        use brand::xor::{Xorshift64};
 
         let mut rng = Lcg::new(1902302);
         $test(&mut rng, $count)?;
 
         let mut rng = TinyLcg::new(1902302);
         $test(&mut rng, $count)?;
+
+        let mut rng = Xorshift64::new(1902302);
+        $test(&mut rng, $count)?;
     }};
 }
 pub(crate) use run_all_rngs;
 
+#[allow(dead_code)]
 pub fn write_p6(filename: &str, data: &[u8], width: usize, height: usize) -> io::Result<()> {
     let mut writer = BufWriter::new(open_file(&filename)?);
     
@@ -30,6 +35,7 @@ pub fn write_p6(filename: &str, data: &[u8], width: usize, height: usize) -> io:
     Ok(())
 }
 
+#[allow(dead_code)]
 fn open_file(filename: &str) -> io::Result<File> {
     let path = Path::new(&filename);
     if let Some(parent) = path.parent() {

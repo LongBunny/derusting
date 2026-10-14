@@ -6,7 +6,7 @@ use std::any::type_name;
 
 fn main() -> std::io::Result<()> {
     run_all_rngs!(distribution, 10_000_000);
-    
+
     Ok(())
 }
 
@@ -33,6 +33,7 @@ fn distribution<R: Rng>(rng: &mut R, samples: usize) -> std::io::Result<()> {
     for bucket in histogram {
         print!("{}, ", bucket);
     }
+    println!("\n");
 
     Ok(())
 }

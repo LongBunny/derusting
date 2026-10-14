@@ -29,6 +29,8 @@ fn frequencies<R: Rng>(rng: &mut R, samples: usize) -> std::io::Result<()> {
         let frequency = 100f64 / samples as f64 * bit as f64;
         println!("Bit {:2}: {:.4}%", i, frequency);
     }
+
+    println!("\n");
     
     Ok(())
 }

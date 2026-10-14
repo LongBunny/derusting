@@ -1,4 +1,5 @@
 pub mod lcg;
+pub mod xor;
 
 pub trait Rng {
     fn new(seed: u64) -> Self;

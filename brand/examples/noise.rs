@@ -28,5 +28,7 @@ fn noise<R: Rng>(rng: &mut R, _iterations: usize) -> std::io::Result<()> {
     write_p6(&format!("out/{name}/noise_lo.ppm"), &low, WIDTH, HEIGHT)?;
     write_p6(&format!("out/{name}/noise_hi.ppm"), &high, WIDTH, HEIGHT)?;
 
+    println!("\n");
+
     Ok(())
 }
