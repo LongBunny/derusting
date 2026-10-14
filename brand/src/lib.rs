@@ -5,6 +5,7 @@ pub mod lcg;
 pub mod xor;
 pub mod splitmix;
 pub mod pcg;
+pub mod mt;
 
 pub trait Rng {
     fn new(seed: u64) -> Self;
