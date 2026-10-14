@@ -1,17 +1,16 @@
+mod common;
+
+use crate::common::run_all_rngs;
+use brand::Rng;
 use std::any::type_name;
 
-use brand::lcg::{Lcg, TinyLcg};
-use brand::Rng;
-
-fn main() {
-    let mut rng = Lcg::new(16231235);
-    frequencies(&mut rng, 1_000_000);
+fn main() -> std::io::Result<()> {
+    run_all_rngs!(frequencies, 1_000_000);
     
-    let mut rng = TinyLcg::new(16231235);
-    frequencies(&mut rng, 1_000_000);
+    Ok(())
 }
 
-fn frequencies<R: Rng>(rng: &mut R, samples: usize) {
+fn frequencies<R: Rng>(rng: &mut R, samples: usize) -> std::io::Result<()> {
     println!("=========== {} ===========", type_name::<R>().rsplit("::").next().unwrap().to_uppercase());
     
     let mut bits = [0u64; 64];
@@ -30,4 +29,6 @@ fn frequencies<R: Rng>(rng: &mut R, samples: usize) {
         let frequency = 100f64 / samples as f64 * bit as f64;
         println!("Bit {:2}: {:.4}%", i, frequency);
     }
+    
+    Ok(())
 }

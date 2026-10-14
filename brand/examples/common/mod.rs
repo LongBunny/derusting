@@ -1,7 +1,20 @@
 ﻿use std::fs::{File, OpenOptions};
+use std::io::{BufWriter, Write};
 use std::path::Path;
 use std::{fs, io};
-use std::io::{Write, BufWriter};
+
+macro_rules! run_all_rngs {
+    ($test:ident, $count:expr) => {{
+        use brand::lcg::{Lcg, TinyLcg};
+
+        let mut rng = Lcg::new(1902302);
+        $test(&mut rng, $count)?;
+
+        let mut rng = TinyLcg::new(1902302);
+        $test(&mut rng, $count)?;
+    }};
+}
+pub(crate) use run_all_rngs;
 
 pub fn write_p6(filename: &str, data: &[u8], width: usize, height: usize) -> io::Result<()> {
     let mut writer = BufWriter::new(open_file(&filename)?);

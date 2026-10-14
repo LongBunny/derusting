@@ -1,16 +1,16 @@
-use std::any::type_name;
-use brand::lcg::{Lcg, TinyLcg};
-use brand::Rng;
+mod common;
 
-fn main() {
-    let mut rng = Lcg::new(16231235);
-    distribution(&mut rng, 10_000_000);
+use crate::common::run_all_rngs;
+use brand::Rng;
+use std::any::type_name;
+
+fn main() -> std::io::Result<()> {
+    run_all_rngs!(distribution, 10_000_000);
     
-    let mut rng = TinyLcg::new(16231235);
-    distribution(&mut rng, 10_000_000);
+    Ok(())
 }
 
-fn distribution<R: Rng>(rng: &mut R, samples: usize) {
+fn distribution<R: Rng>(rng: &mut R, samples: usize) -> std::io::Result<()> {
     println!("=========== {} ===========", type_name::<R>().rsplit("::").next().unwrap().to_uppercase());
     let mut min = f64::INFINITY;
     let mut max = f64::NEG_INFINITY;
@@ -33,4 +33,6 @@ fn distribution<R: Rng>(rng: &mut R, samples: usize) {
     for bucket in histogram {
         print!("{}, ", bucket);
     }
+
+    Ok(())
 }
