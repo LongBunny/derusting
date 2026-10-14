@@ -1,5 +1,7 @@
 pub mod lcg;
 pub mod xor;
+pub mod splitmix;
+pub mod pcg;
 
 pub trait Rng {
     fn new(seed: u64) -> Self;
@@ -7,6 +9,12 @@ pub trait Rng {
     
     fn next_u32(&mut self) -> u32 {
         (self.next_u64() >> 32) as u32
+    }
+    fn next_u16(&mut self) -> u16 {
+        (self.next_u64() >> 48) as u16
+    }
+    fn next_u8(&mut self) -> u8 {
+        (self.next_u64() >> 56) as u8
     }
     
     fn next_f64(&mut self) -> f64 {
