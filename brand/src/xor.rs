@@ -14,12 +14,12 @@ impl Rng for Xorshift64 {
     }
 
     fn next_u64(&mut self) -> u64 {
-        let mut value = self.state.get();
-        value ^= value << 13;
-        value ^= value >> 7;
-        value ^= value << 17;
-        self.state = NonZeroU64::new(value).expect("Xorshift state transition preserves nonzero state");
-        value
+        let mut result = self.state.get();
+        result ^= result << 13;
+        result ^= result >> 7;
+        result ^= result << 17;
+        self.state = NonZeroU64::new(result).expect("Xorshift state transition preserves nonzero state");
+        result
     }
 }
 
@@ -35,12 +35,12 @@ impl Rng for Xorshift64Star {
     }
 
     fn next_u64(&mut self) -> u64 {
-        let mut value = self.state.get();
-        value ^= value >> 12;
-        value ^= value << 25;
-        value ^= value >> 27;
-        self.state = NonZeroU64::new(value).expect("Xorshift state transition preserves nonzero state");
-        value.wrapping_mul(0x2545F4914F6CDD1D)
+        let mut result = self.state.get();
+        result ^= result >> 12;
+        result ^= result << 25;
+        result ^= result >> 27;
+        self.state = NonZeroU64::new(result).expect("Xorshift state transition preserves nonzero state");
+        result.wrapping_mul(0x2545F4914F6CDD1D)
     }
 }
 
@@ -70,7 +70,7 @@ impl Rng for Xoshiro256SS {
     }
 
     fn next_u64(&mut self) -> u64 {
-        let value = self.state[1]
+        let result = self.state[1]
             .wrapping_mul(5)
             .rotate_left(7)
             .wrapping_mul(9);
@@ -84,6 +84,43 @@ impl Rng for Xoshiro256SS {
         self.state[2] ^= t;
         self.state[3] = self.state[3].rotate_left(45);
 
-        value
+        result
+    }
+}
+
+pub struct XoroshiroPlus {
+    state: [u64; 2],
+}
+
+impl Rng for XoroshiroPlus {
+    fn new(seed: u64) -> Self {
+        let mut seed_rng = Splitmix64::new(seed);
+        let result = Self {
+            state: [
+                seed_rng.next_u64(),
+                seed_rng.next_u64(),
+            ],
+        };
+
+        debug_assert_ne!(
+            result.state,
+            [0; 2],
+            "Xoroshiro128+ state must not be all zero"
+        );
+
+        result
+    }
+
+    fn next_u64(&mut self) -> u64 {
+        let s0 = self.state[0];
+        let mut s1 = self.state[1];
+
+        let result = s0.wrapping_add(s1);
+
+        s1 ^= s0;
+        self.state[0] = s0.rotate_left(24) ^ s1 ^ (s1 << 16);
+        self.state[1] = s1.rotate_left(37);
+
+        result
     }
 }

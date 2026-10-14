@@ -13,9 +13,9 @@ impl Rng for Pcg32 {
     fn new(seed: u64) -> Self {
         let mut rng = Self { state: 0 };
 
-        rng.next_u64();
+        rng.next_u32();
         rng.state = rng.state.wrapping_add(seed);
-        rng.next_u64();
+        rng.next_u32();
 
         rng
     }

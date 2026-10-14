@@ -6,7 +6,7 @@ use std::{fs, io};
 macro_rules! run_all_rngs {
     ($test:ident, $count:expr) => {{
         use brand::lcg::{Lcg, TinyLcg};
-        use brand::xor::{Xorshift64, Xorshift64Star, Xoshiro256SS};
+        use brand::xor::{Xorshift64, Xorshift64Star, Xoshiro256SS, XoroshiroPlus};
         use brand::splitmix::{Splitmix64};
         use brand::pcg::{Pcg32};
 
@@ -23,6 +23,9 @@ macro_rules! run_all_rngs {
         $test(&mut rng, $count)?;
 
         let mut rng = Xoshiro256SS::new(1902302);
+        $test(&mut rng, $count)?;
+
+        let mut rng = XoroshiroPlus::new(1902302);
         $test(&mut rng, $count)?;
 
         let mut rng = Splitmix64::new(1902302);
