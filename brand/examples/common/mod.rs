@@ -9,6 +9,7 @@ macro_rules! run_all_rngs {
         use brand::xor::{Xorshift64, Xorshift64Star, Xoshiro256SS, XoroshiroPlus};
         use brand::splitmix::{Splitmix64};
         use brand::pcg::{Pcg32};
+        use brand::mt::{Mt19937};
 
         let mut rng = Lcg::new(1902302);
         $test(&mut rng, $count)?;
@@ -32,6 +33,9 @@ macro_rules! run_all_rngs {
         $test(&mut rng, $count)?;
 
         let mut rng = Pcg32::new(1902302);
+        $test(&mut rng, $count)?;
+        
+        let mut rng = Mt19937::new(1902302);
         $test(&mut rng, $count)?;
     }};
 }
